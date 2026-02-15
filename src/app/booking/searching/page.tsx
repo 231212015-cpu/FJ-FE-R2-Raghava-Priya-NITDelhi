@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { X, Car } from "lucide-react";
 import { useRideStore } from "@/stores/ride-store";
 import { useNotificationStore } from "@/stores/notification-store";
@@ -65,14 +64,11 @@ export default function SearchingPage() {
             style={{ animationDelay: "1s", animationDuration: '2s' }}
           />
 
-          {/* Car illustration */}
+          {/* Car icon */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative w-32 h-32">
-              <Image
-                src="/assets/auto-rickshaw.svg"
-                alt="Searching"
-                fill
-                className="object-contain animate-bounce"
+            <div className="w-32 h-32 flex items-center justify-center bg-primary/10 rounded-full">
+              <Car 
+                className="w-16 h-16 text-primary animate-bounce" 
                 style={{ animationDuration: '2s' }}
               />
             </div>

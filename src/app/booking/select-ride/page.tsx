@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
 import {
@@ -17,6 +18,7 @@ import {
   Share2,
   Copy,
   Check,
+  Tag,
 } from "lucide-react";
 import { useRideStore } from "@/stores/ride-store";
 import type { RideType } from "@/types";
@@ -465,20 +467,32 @@ export default function SelectRidePage() {
           </div>
 
           {/* Promo Code */}
-          <div className="flex items-center gap-3 p-4 bg-muted rounded-xl">
-            <Zap className="w-5 h-5 text-primary" />
-            <input
-              type="text"
-              value={promoCode}
-              onChange={(e) => setPromoCode(e.target.value)}
-              placeholder="Enter promo code"
-              className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
-            />
-            {promoCode && (
-              <button className="text-primary text-sm font-medium">
-                Apply
-              </button>
-            )}
+          <div className="space-y-2">
+            <div className="flex items-center gap-3 p-4 bg-muted rounded-xl">
+              <Zap className="w-5 h-5 text-primary" />
+              <input
+                type="text"
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value)}
+                placeholder="Enter promo code"
+                className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
+              />
+              {promoCode && (
+                <button className="text-primary text-sm font-medium">
+                  Apply
+                </button>
+              )}
+            </div>
+            
+            {/* Browse Offers Link */}
+            <Link 
+              href="/offers" 
+              className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+            >
+              <Tag className="w-4 h-4" />
+              <span>Browse available offers</span>
+              <ChevronRight className="w-4 h-4" />
+            </Link>
           </div>
 
           {/* Payment Method */}
