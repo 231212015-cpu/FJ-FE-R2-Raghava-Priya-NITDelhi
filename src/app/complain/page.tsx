@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { 
@@ -56,7 +56,7 @@ const complaintCategories = [
   },
 ];
 
-export default function ComplainPage() {
+function ComplainPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const rideId = searchParams.get("rideId");
@@ -256,3 +256,12 @@ export default function ComplainPage() {
     </div>
   );
 }
+
+export default function ComplainPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" /></div>}>
+      <ComplainPageContent />
+    </Suspense>
+  );
+}
+

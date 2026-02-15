@@ -13,9 +13,9 @@ import {
   X,
 } from "lucide-react";
 import { useRideStore } from "@/stores/ride-store";
-import dynamic from "next/dynamic";
+import dynamicImport from "next/dynamic";
 
-const MapView = dynamic(() => import("@/components/common/MapView"), {
+const MapView = dynamicImport(() => import("@/components/common/MapView"), {
   ssr: false,
   loading: () => (
     <div className="w-full h-full bg-muted animate-pulse" />
