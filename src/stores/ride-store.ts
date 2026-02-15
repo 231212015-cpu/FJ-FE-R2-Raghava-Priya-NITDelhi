@@ -29,6 +29,7 @@ interface RideState {
 
 const FARE_RATES: Record<RideType, number> = {
   economy: 1.5,
+  auto: 1.0,
   premium: 2.5,
   suv: 3.0,
   bike: 0.8,
