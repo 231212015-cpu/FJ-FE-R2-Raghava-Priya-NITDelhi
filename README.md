@@ -1,5 +1,7 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## live project link : https://fj-fe-r2-raghava-priya-nitdelhi.onrender.com
+
 ## Getting Started
 
 First, run the development server:
