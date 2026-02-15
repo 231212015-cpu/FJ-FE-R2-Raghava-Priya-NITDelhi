@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Star, Phone, MessageCircle, Car, Check } from "lucide-react";
 import { useRideStore } from "@/stores/ride-store";
+import { useNotificationStore } from "@/stores/notification-store";
+import { toast } from "sonner";
 
 const mockDriver = {
   id: "driver-1",
@@ -21,15 +23,29 @@ const mockDriver = {
 export default function DriverFoundPage() {
   const router = useRouter();
   const { currentRide } = useRideStore();
+  const { addNotification } = useNotificationStore();
   const [showConfetti, setShowConfetti] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    // Show "driver arriving" notification after 2 seconds
+    const arrivingTimer = setTimeout(() => {
+      addNotification({
+        type: "driver_arriving",
+        title: "Driver Arriving Soon",
+        message: `${mockDriver.name} is 2 minutes away`,
+      });
+      toast.info(`${mockDriver.name} is 2 minutes away`);
+    }, 2000);
+
+    const confettiTimer = setTimeout(() => {
       setShowConfetti(false);
     }, 2000);
 
-    return () => clearTimeout(timer);
-  }, []);
+    return () => {
+      clearTimeout(arrivingTimer);
+      clearTimeout(confettiTimer);
+    };
+  }, [addNotification]);
 
   const handleContinue = () => {
     router.push("/booking/tracking");

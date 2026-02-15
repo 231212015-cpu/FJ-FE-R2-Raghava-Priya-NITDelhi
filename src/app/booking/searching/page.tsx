@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { X, Car } from "lucide-react";
 import { useRideStore } from "@/stores/ride-store";
+import { useNotificationStore } from "@/stores/notification-store";
+import { toast } from "sonner";
 
 export default function SearchingPage() {
   const router = useRouter();
@@ -14,6 +16,8 @@ export default function SearchingPage() {
 
   // Simulate driver search
   useEffect(() => {
+    const { addNotification } = useNotificationStore.getState();
+
     const timer = setInterval(() => {
       setSearchTime((t) => t + 1);
     }, 1000);
@@ -24,6 +28,12 @@ export default function SearchingPage() {
 
     // Simulate finding a driver after 3-5 seconds
     const findDriver = setTimeout(() => {
+      addNotification({
+        type: "driver_found",
+        title: "Driver Found!",
+        message: "Rajesh Kumar is on the way to pick you up",
+      });
+      toast.success("Driver found! Rajesh Kumar will pick you up soon");
       router.push("/booking/driver-found");
     }, 3000 + Math.random() * 2000);
 

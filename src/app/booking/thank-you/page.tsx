@@ -6,10 +6,13 @@ import Image from "next/image";
 import { CheckCircle, Home, Clock, Share2, Sparkles, X } from "lucide-react";
 import confetti from "canvas-confetti";
 import { useRideStore } from "@/stores/ride-store";
+import { useNotificationStore } from "@/stores/notification-store";
+import { toast } from "sonner";
 
 export default function ThankYouPage() {
   const router = useRouter();
   const { loyaltyPoints, pointsPerRide } = useRideStore();
+  const { addNotification } = useNotificationStore();
   const [showReward, setShowReward] = useState(false);
 
   useEffect(() => {
@@ -21,9 +24,24 @@ export default function ThankYouPage() {
       colors: ["#1e3a8a", "#3b82f6", "#60a5fa"],
     });
 
+    // Add payment processed notification
+    addNotification({
+      type: "payment_processed",
+      title: "Payment Successful",
+      message: "Your payment has been processed securely",
+    });
+    toast.success("Payment processed successfully");
+
+    // Add ride completed notification
+    addNotification({
+      type: "ride_completed",
+      title: "Ride Completed",
+      message: `You've earned ${pointsPerRide} loyalty points!`,
+    });
+
     const timer = setTimeout(() => setShowReward(true), 350);
     return () => clearTimeout(timer);
-  }, []);
+  }, [addNotification, pointsPerRide]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">

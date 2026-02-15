@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   Menu,
-  Bell,
   MapPin,
   Search,
   Car,
@@ -17,6 +16,7 @@ import {
 import { useAuthStore } from "@/stores/auth-store";
 import { useRideStore } from "@/stores/ride-store";
 import SideMenu from "@/components/layout/SideMenu";
+import { NotificationCenter } from "@/components/common/NotificationCenter";
 import dynamic from "next/dynamic";
 
 // Dynamically import map to avoid SSR issues
@@ -104,10 +104,7 @@ export default function HomePage() {
           </button>
 
           <div className="flex items-center gap-3">
-            <button className="w-12 h-12 rounded-full bg-background shadow-lg flex items-center justify-center hover:bg-muted transition-colors relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full" />
-            </button>
+            <NotificationCenter />
             <div className="w-12 h-12 rounded-full bg-primary overflow-hidden">
               {user?.avatar ? (
                 <Image

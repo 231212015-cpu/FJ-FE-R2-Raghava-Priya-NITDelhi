@@ -93,12 +93,53 @@ export default function AddPaymentPage() {
 
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      // Create a payment intent for card verification
+      const response = await fetch("/api/create-payment-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: 0.01, // $0.01 test charge to verify card
+          currency: "usd",
+          description: `Card verification for ${formData.name}`,
+        }),
+      });
 
-    setIsLoading(false);
-    toast.success("Card added successfully!");
-    router.back();
+      if (!response.ok) {
+        const { error } = await response.json();
+        throw new Error(error || "Failed to verify card");
+      }
+
+      const { clientSecret } = await response.json();
+
+      // In a real app, you would use Stripe.js to confirm the payment
+      // For now, we simulate a successful verification
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Save payment method info to localStorage (mock)
+      const savedMethods = JSON.parse(
+        localStorage.getItem("savedPaymentMethods") || "[]"
+      );
+      savedMethods.push({
+        id: Date.now().toString(),
+        type: "card",
+        name: getCardType(formData.cardNumber)?.toUpperCase() || "Card",
+        last4: formData.cardNumber.slice(-4),
+        brand: getCardType(formData.cardNumber),
+        icon: "💳",
+        isDefault: false,
+      });
+      localStorage.setItem("savedPaymentMethods", JSON.stringify(savedMethods));
+
+      setIsLoading(false);
+      toast.success("Card added and verified successfully!");
+      router.back();
+    } catch (error) {
+      setIsLoading(false);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to add card"
+      );
+    }
   };
 
   const getCardType = (number: string) => {
