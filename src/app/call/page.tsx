@@ -15,7 +15,7 @@ import {
 
 const mockDriver = {
   name: "Rajesh Kumar",
-  avatar: "/assets/43_Profile.svg",
+  avatar: "/assets/avatar-male-2.svg",
   phone: "+91 98765 43210",
 };
 

@@ -1,0 +1,53 @@
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="200" cy="200" r="200" fill="#8B5CF6"/>
+  
+  <!-- Face -->
+  <ellipse cx="200" cy="182" rx="82" ry="92" fill="#FFD5B5"/>
+  
+  <!-- Hair (Short modern style) -->
+  <path d="M118 145C118 98 148 70 200 70C252 70 282 98 282 145C282 150 281 155 280 160L276 145C272 125 258 110 240 103C222 96 202 95 182 103C164 110 148 125 123 145C120 148 119 147 118 145Z" fill="#3B2614"/>
+  <path d="M118 140L125 130C130 122 138 115 148 110L155 125C150 128 145 132 140 137L118 140Z" fill="#3B2614"/>
+  <path d="M282 140L275 130C270 122 262 115 252 110L245 125C250 128 255 132 260 137L282 140Z" fill="#3B2614"/>
+  
+  <!-- Ears -->
+  <ellipse cx="118" cy="182" rx="17" ry="24" fill="#F4C4A0"/>
+  <ellipse cx="282" cy="182" rx="17" ry="24" fill="#F4C4A0"/>
+  
+  <!-- Glasses -->
+  <rect x="150" y="165" width="40" height="35" rx="8" fill="none" stroke="#2C1810" stroke-width="4"/>
+  <rect x="210" y="165" width="40" height="35" rx="8" fill="none" stroke="#2C1810" stroke-width="4"/>
+  <line x1="190" y1="182" x2="210" y2="182" stroke="#2C1810" stroke-width="4"/>
+  <line x1="148" y1="182" x2="135" y2="182" stroke="#2C1810" stroke-width="3"/>
+  <line x1="252" y1="182" x2="265" y2="182" stroke="#2C1810" stroke-width="3"/>
+  
+  <!-- Eyes behind glasses -->
+  <circle cx="170" cy="180" r="8" fill="#2C1810"/>
+  <circle cx="230" cy="180" r="8" fill="#2C1810"/>
+  <circle cx="172" cy="178" r="3" fill="white"/>
+  <circle cx="232" cy="178" r="3" fill="white"/>
+  
+  <!-- Eyebrows -->
+  <path d="M152 158C158 155 168 154 180 156" stroke="#3B2614" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M248 158C242 155 232 154 220 156" stroke="#3B2614" stroke-width="3" stroke-linecap="round" fill="none"/>
+  
+  <!-- Nose -->
+  <path d="M200 182L197 202L200 206L203 202L200 182Z" fill="#E5A589"/>
+  
+  <!-- Mouth (Friendly smile) -->
+  <path d="M178 222C185 230 192 234 200 234C208 234 215 230 222 222" stroke="#2C1810" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M178 222C185 228 192 232 200 232C208 232 215 228 222 222" fill="#D67070"/>
+  
+  <!-- Neck -->
+  <rect x="175" y="262" width="50" height="38" fill="#F4C4A0"/>
+  
+  <!-- Shirt (Casual t-shirt) -->
+  <path d="M148 300L175 262L200 278L225 262L252 300L252 400L148 400Z" fill="#6366F1"/>
+  
+  <!-- T-shirt design (pocket) -->
+  <rect x="165" y="320" width="20" height="25" rx="2" fill="#4F46E5"/>
+  
+  <!-- Collar -->
+  <path d="M175 262L182 278L200 278" fill="#4F46E5"/>
+  <path d="M225 262L218 278L200 278" fill="#4F46E5"/>
+</svg>

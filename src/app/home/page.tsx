@@ -12,6 +12,7 @@ import {
   Clock,
   Star,
   ChevronRight,
+  TramFront,
 } from "lucide-react";
 import { useAuthStore } from "@/stores/auth-store";
 import { useRideStore } from "@/stores/ride-store";
@@ -31,7 +32,7 @@ const MapView = dynamic(() => import("@/components/common/MapView"), {
 
 const transportTypes = [
   { id: "car", name: "Car", icon: Car, color: "bg-primary" },
-  { id: "auto", name: "Auto", icon: Car, color: "bg-green-500" },
+  { id: "auto", name: "Auto", icon: TramFront, color: "bg-green-500" },
   { id: "bike", name: "Bike", icon: Bike, color: "bg-blue-500" },
 ];
 

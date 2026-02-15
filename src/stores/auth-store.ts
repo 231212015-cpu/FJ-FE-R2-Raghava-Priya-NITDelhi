@@ -32,7 +32,7 @@ export const useAuthStore = create<AuthState>()(
           email,
           name: "Vikram Singh",
           phone: "+91 98765 43210",
-          avatar: "/assets/avatar.png",
+          avatar: "/assets/avatar-male-1.svg",
           createdAt: new Date().toISOString(),
         };
         
@@ -53,6 +53,7 @@ export const useAuthStore = create<AuthState>()(
           email,
           name,
           phone: "",
+          avatar: "/assets/avatar-male-1.svg",
           createdAt: new Date().toISOString(),
         };
         

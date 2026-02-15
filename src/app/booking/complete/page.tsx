@@ -25,7 +25,7 @@ const compliments = [
 
 const mockDriver = {
   name: "Rajesh Kumar",
-  avatar: "/assets/43_Profile.svg",
+  avatar: "/assets/avatar-male-2.svg",
 };
 
 export default function CompletePage() {

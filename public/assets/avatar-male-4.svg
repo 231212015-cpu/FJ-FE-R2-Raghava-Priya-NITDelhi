@@ -1,0 +1,50 @@
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="200" cy="200" r="200" fill="#F59E0B"/>
+  
+  <!-- Face -->
+  <ellipse cx="200" cy="185" rx="80" ry="90" fill="#FFE0BB"/>
+  
+  <!-- Hair (Short professional style) -->
+  <path d="M120 150C120 105 150 75 200 75C250 75 280 105 280 150C280 155 279 160 278 165L273 150C270 130 256 115 238 108C220 101 200 100 180 108C162 115 148 130 125 150C122 153 121 152 120 150Z" fill="#654321"/>
+  
+  <!-- Ears -->
+  <ellipse cx="120" cy="185" rx="16" ry="23" fill="#F4C9A0"/>
+  <ellipse cx="280" cy="185" rx="16" ry="23" fill="#F4C9A0"/>
+  
+  <!-- Eyes -->
+  <ellipse cx="170" cy="175" rx="13" ry="15" fill="white"/>
+  <ellipse cx="230" cy="175" rx="13" ry="15" fill="white"/>
+  <circle cx="172" cy="177" r="9" fill="#3B2614"/>
+  <circle cx="232" cy="177" r="9" fill="#3B2614"/>
+  <circle cx="174" cy="174" r="3" fill="white"/>
+  <circle cx="234" cy="174" r="3" fill="white"/>
+  
+  <!-- Eyebrows -->
+  <path d="M156 162C162 159 172 158 184 160" stroke="#654321" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M244 162C238 159 228 158 216 160" stroke="#654321" stroke-width="4" stroke-linecap="round" fill="none"/>
+  
+  <!-- Nose -->
+  <path d="M200 185L196 203L200 207L204 203L200 185Z" fill="#E5B595"/>
+  
+  <!-- Mouth (Confident smile) -->
+  <path d="M178 223C185 230 192 234 200 234C208 234 215 230 222 223" stroke="#3B2614" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M178 223C185 228 192 232 200 232C208 232 215 228 222 223" fill="#D67070"/>
+  
+  <!-- Light stubble -->
+  <ellipse cx="200" cy="235" rx="35" ry="15" fill="#654321" opacity="0.2"/>
+  
+  <!-- Neck -->
+  <rect x="175" y="265" width="50" height="35" fill="#F4C9A0"/>
+  
+  <!-- Polo shirt -->
+  <path d="M148 300L175 265L200 278L225 265L252 300L252 400L148 400Z" fill="#D97706"/>
+  
+  <!-- Collar (polo style) -->
+  <path d="M175 265L180 278L190 275L200 278" fill="#B45309" stroke="#92400E" stroke-width="2"/>
+  <path d="M225 265L220 278L210 275L200 278" fill="#B45309" stroke="#92400E" stroke-width="2"/>
+  
+  <!-- Polo shirt buttons -->
+  <circle cx="200" cy="290" r="3" fill="#92400E"/>
+  <circle cx="200" cy="305" r="3" fill="#92400E"/>
+</svg>

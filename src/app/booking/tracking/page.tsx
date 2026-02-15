@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
@@ -15,6 +15,8 @@ import {
   X,
 } from "lucide-react";
 import { useRideStore } from "@/stores/ride-store";
+import { a11y } from "@/lib/accessibility";
+// import { subscribeToLocationUpdates } from "@/lib/socket-helper"; // Uncomment when Socket.io server is ready
 import dynamic from "next/dynamic";
 
 const MapView = dynamic(() => import("@/components/common/MapView"), {
@@ -25,10 +27,25 @@ const MapView = dynamic(() => import("@/components/common/MapView"), {
 const mockDriver = {
   id: "driver-1",
   name: "Michael Smith",
-  avatar: "/assets/43_Profile.svg",
+  avatar: "/assets/avatar-male-4.svg",
   rating: 4.9,
   carModel: "Toyota Camry",
   carNumber: "ABC 1234",
+};
+
+// Calculate distance between two coordinates (in km)
+const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLng = (lng2 - lng1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
 };
 
 export default function TrackingPage() {
@@ -36,35 +53,95 @@ export default function TrackingPage() {
   const { currentRide, pickup, destination, cancelRide } = useRideStore();
   const [status, setStatus] = useState<"arriving" | "arrived" | "in-progress" | "completed">("arriving");
   const [eta, setEta] = useState(5);
+  const [distance, setDistance] = useState(0);
+  const [speed, setSpeed] = useState(0);
+  const locationUpdateRef = useRef<NodeJS.Timeout | null>(null);
   const [driverLocation, setDriverLocation] = useState({
     lat: (pickup?.lat || 37.7749) + 0.01,
     lng: (pickup?.lng || -122.4194) + 0.01,
   });
   const [showCancelModal, setShowCancelModal] = useState(false);
 
-  // Simulate driver movement
+  // Enhanced GPS simulation with realistic movement
   useEffect(() => {
     if (status === "arriving" && pickup) {
-      const interval = setInterval(() => {
-        setDriverLocation((prev) => ({
-          lat: prev.lat - (prev.lat - pickup.lat) * 0.1,
-          lng: prev.lng - (prev.lng - pickup.lng) * 0.1,
-        }));
-        setEta((prev) => Math.max(0, prev - 1));
+      // Calculate initial distance
+      const initialDistance = calculateDistance(
+        driverLocation.lat,
+        driverLocation.lng,
+        pickup.lat,
+        pickup.lng
+      );
+      setDistance(initialDistance);
+
+      locationUpdateRef.current = setInterval(() => {
+        setDriverLocation((prev) => {
+          // Simulate GPS updates with slight variations (like real GPS)
+          const noise = () => (Math.random() - 0.5) * 0.0001; // Small GPS jitter
+          const movementFactor = 0.15; // How fast driver moves toward destination
+          
+          const newLat = prev.lat - (prev.lat - pickup.lat) * movementFactor + noise();
+          const newLng = prev.lng - (prev.lng - pickup.lng) * movementFactor + noise();
+          
+          // Calculate new distance and speed
+          const newDistance = calculateDistance(newLat, newLng, pickup.lat, pickup.lng);
+          const distanceTraveled = distance - newDistance;
+          const currentSpeed = (distanceTraveled * 60).toFixed(1); // km/h (update every second)
+          
+          setDistance(newDistance);
+          setSpeed(parseFloat(currentSpeed));
+          
+          // Update ETA based on distance and average speed
+          const avgSpeed = 30; // km/h average city speed
+          const newEta = Math.ceil((newDistance / avgSpeed) * 60); // minutes
+          setEta(Math.max(1, newEta));
+          
+          return { lat: newLat, lng: newLng };
+        });
+      }, 1000); // Update every second like real GPS
+
+      // Driver arrives when close enough
+      const arrivalCheckInterval = setInterval(() => {
+        const distToPickup = calculateDistance(
+          driverLocation.lat,
+          driverLocation.lng,
+          pickup.lat,
+          pickup.lng
+        );
+        
+        if (distToPickup < 0.05) { // Within 50 meters
+          setStatus("arrived");
+          setEta(0);
+          setDistance(0);
+          setSpeed(0);
+          clearInterval(arrivalCheckInterval);
+          if (locationUpdateRef.current) {
+            clearInterval(locationUpdateRef.current);
+          }
+        }
       }, 1000);
 
-      // Driver arrives after ETA
-      const arriveTimer = setTimeout(() => {
-        setStatus("arrived");
-        clearInterval(interval);
-      }, eta * 1000);
-
       return () => {
-        clearInterval(interval);
-        clearTimeout(arriveTimer);
+        if (locationUpdateRef.current) {
+          clearInterval(locationUpdateRef.current);
+        }
+        clearInterval(arrivalCheckInterval);
       };
     }
-  }, [status, pickup, eta]);
+
+    /* Uncomment when Socket.io server is ready
+    if (currentRide?.id) {
+      const unsubscribe = subscribeToLocationUpdates(currentRide.id, (location) => {
+        setDriverLocation({
+          lat: location.latitude,
+          lng: location.longitude,
+        });
+        // Update ETA and distance based on real location
+      });
+      return () => unsubscribe();
+    }
+    */
+  }, [status, pickup, driverLocation.lat, driverLocation.lng, distance]);
 
   // Simulate ride progress
   useEffect(() => {
@@ -131,6 +208,7 @@ export default function TrackingPage() {
         <button
           onClick={() => router.back()}
           className="absolute top-4 left-4 w-10 h-10 rounded-full bg-background shadow-lg flex items-center justify-center hover:bg-muted transition-colors"
+          aria-label={a11y.nav.back}
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -139,6 +217,9 @@ export default function TrackingPage() {
         <div className="absolute top-4 left-1/2 -translate-x-1/2">
           <div
             className={`${getStatusColor()} text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2`}
+            role="status"
+            aria-live="polite"
+            aria-label={`Ride status: ${getStatusText()}`}
           >
             <Clock className="w-4 h-4" />
             <span className="font-medium text-sm">{getStatusText()}</span>
@@ -210,6 +291,27 @@ export default function TrackingPage() {
             </div>
           </div>
 
+          {/* GPS Tracking Info */}
+          {status === "arriving" && (
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-card border border-border rounded-xl p-3 text-center">
+                <Navigation className="w-5 h-5 text-primary mx-auto mb-1" />
+                <p className="text-xs text-muted-foreground">Distance</p>
+                <p className="font-bold text-foreground">{distance.toFixed(2)} km</p>
+              </div>
+              <div className="bg-card border border-border rounded-xl p-3 text-center">
+                <Clock className="w-5 h-5 text-primary mx-auto mb-1" />
+                <p className="text-xs text-muted-foreground">ETA</p>
+                <p className="font-bold text-foreground">{eta} min</p>
+              </div>
+              <div className="bg-card border border-border rounded-xl p-3 text-center">
+                <div className="w-5 h-5 text-primary mx-auto mb-1 flex items-center justify-center text-lg">⚡</div>
+                <p className="text-xs text-muted-foreground">Speed</p>
+                <p className="font-bold text-foreground">{speed > 0 ? speed : "--"} km/h</p>
+              </div>
+            </div>
+          )}
+
           {/* Route Info */}
           <div className="space-y-3">
             <div className="flex items-start gap-3">
@@ -238,7 +340,7 @@ export default function TrackingPage() {
           </div>
 
           {/* Safety */}
-          <button className="w-full flex items-center gap-3 p-4 bg-destructive/10 rounded-xl hover:bg-destructive/20 transition-colors">
+          <button className="w-full flex items-center gap-3 p-4 bg-destructive/10 rounded-xl hover:bg-destructive/20 transition-colors" aria-label="Share ride details or get emergency help">
             <AlertCircle className="w-5 h-5 text-destructive" />
             <span className="text-sm font-medium text-destructive">
               Share ride details or get help
@@ -252,17 +354,19 @@ export default function TrackingPage() {
             <button
               onClick={handleComplete}
               className="w-full h-14 rounded-full bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity"
+              aria-label={a11y.ride.complete}
             >
               Complete Ride (Demo)
             </button>
           ) : status === "arrived" ? (
-            <p className="text-center text-primary font-medium py-4">
+            <p className="text-center text-primary font-medium py-4" role="status">
               🚗 Your driver is waiting outside!
             </p>
           ) : (
             <button
               onClick={() => setShowCancelModal(true)}
               className="w-full h-14 rounded-full border-2 border-destructive text-destructive font-semibold hover:bg-destructive/10 transition-colors"
+              aria-label={a11y.ride.cancel}
             >
               Cancel Ride
             </button>
@@ -276,13 +380,14 @@ export default function TrackingPage() {
           <div
             className="fixed inset-0 bg-black/50 z-40"
             onClick={() => setShowCancelModal(false)}
+            role="presentation"
           />
-          <div className="fixed bottom-0 left-0 right-0 bg-background rounded-t-3xl z-50 p-6 animate-slide-up safe-area-bottom">
+          <div className="fixed bottom-0 left-0 right-0 bg-background rounded-t-3xl z-50 p-6 animate-slide-up safe-area-bottom" role="dialog" aria-labelledby="cancel-dialog-title" aria-modal="true">
             <div className="text-center space-y-4">
               <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto">
                 <X className="w-8 h-8 text-destructive" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground">
+              <h3 className="text-lg font-semibold text-foreground" id="cancel-dialog-title">
                 Cancel Ride?
               </h3>
               <p className="text-muted-foreground">
@@ -292,12 +397,14 @@ export default function TrackingPage() {
                 <button
                   onClick={() => setShowCancelModal(false)}
                   className="flex-1 h-12 rounded-full border border-border font-medium hover:bg-muted transition-colors"
+                  aria-label="Keep ride"
                 >
                   Keep Ride
                 </button>
                 <button
                   onClick={handleCancel}
                   className="flex-1 h-12 rounded-full bg-destructive text-white font-medium hover:opacity-90 transition-opacity"
+                  aria-label="Cancel ride"
                 >
                   Cancel Ride
                 </button>

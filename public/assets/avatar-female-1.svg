@@ -1,0 +1,57 @@
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="200" cy="200" r="200" fill="#EC4899"/>
+  
+  <!-- Face -->
+  <ellipse cx="200" cy="185" rx="80" ry="90" fill="#FDBEA0"/>
+  
+  <!-- Hair -->
+  <path d="M120 140C120 95 150 65 200 65C250 65 280 95 280 140C280 160 278 175 275 185L270 155C268 135 258 120 245 110C230 98 215 92 200 92C185 92 170 98 155 110C142 120 132 135 125 155C122 170 120 155 120 140Z" fill="#8B4513"/>
+  <!-- Long hair sides -->
+  <ellipse cx="120" cy="220" rx="30" ry="70" fill="#8B4513"/>
+  <ellipse cx="280" cy="220" rx="30" ry="70" fill="#8B4513"/>
+  
+  <!-- Ears -->
+  <ellipse cx="120" cy="185" rx="15" ry="22" fill="#F4A86F"/>
+  <ellipse cx="280" cy="185" rx="15" ry="22" fill="#F4A86F"/>
+  
+  <!-- Eyes -->
+  <ellipse cx="170" cy="175" rx="14" ry="16" fill="white"/>
+  <ellipse cx="230" cy="175" rx="14" ry="16" fill="white"/>
+  <circle cx="172" cy="177" r="9" fill="#654321"/>
+  <circle cx="232" cy="177" r="9" fill="#654321"/>
+  <circle cx="175" cy="174" r="3" fill="white"/>
+  <circle cx="235" cy="174" r="3" fill="white"/>
+  
+  <!-- Eyelashes -->
+  <path d="M158 168L156 163" stroke="#2C1810" stroke-width="2" stroke-linecap="round"/>
+  <path d="M165 165L164 160" stroke="#2C1810" stroke-width="2" stroke-linecap="round"/>
+  <path d="M175 164L176 159" stroke="#2C1810" stroke-width="2" stroke-linecap="round"/>
+  <path d="M242 168L244 163" stroke="#2C1810" stroke-width="2" stroke-linecap="round"/>
+  <path d="M235 165L236 160" stroke="#2C1810" stroke-width="2" stroke-linecap="round"/>
+  <path d="M225 164L224 159" stroke="#2C1810" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Eyebrows -->
+  <path d="M158 160C165 157 175 156 185 158" stroke="#654321" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M242 160C235 157 225 156 215 158" stroke="#654321" stroke-width="3" stroke-linecap="round" fill="none"/>
+  
+  <!-- Nose -->
+  <path d="M200 185L197 202L200 206L203 202L200 185Z" fill="#E59870"/>
+  
+  <!-- Lips -->
+  <ellipse cx="200" cy="225" rx="20" ry="8" fill="#D67070"/>
+  <path d="M180 225C185 230 192 232 200 232C208 232 215 230 220 225" stroke="#B85C5C" stroke-width="2" stroke-linecap="round" fill="none"/>
+  
+  <!-- Neck -->
+  <rect x="175" y="265" width="50" height="35" fill="#F4A86F"/>
+  
+  <!-- Dress/Shirt -->
+  <path d="M145 300L175 265L200 280L225 265L255 300L255 400L145 400Z" fill="#EC4899"/>
+  <circle cx="200" cy="320" r="25" fill="#F9A8D4" opacity="0.6"/>
+  <circle cx="220" cy="350" r="20" fill="#F9A8D4" opacity="0.5"/>
+  <circle cx="180" cy="355" r="22" fill="#F9A8D4" opacity="0.5"/>
+  
+  <!-- Necklace -->
+  <ellipse cx="200" cy="295" rx="30" ry="5" fill="#FFD700"/>
+  <circle cx="200" cy="300" r="6" fill="#FFD700"/>
+</svg>

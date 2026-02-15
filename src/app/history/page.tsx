@@ -29,7 +29,7 @@ const mockRides = {
       status: "confirmed",
       driver: {
         name: "Priya Sharma",
-        avatar: "/assets/43_Profile.svg",
+        avatar: "/assets/avatar-female-1.svg",
         rating: 4.8,
         carModel: "Honda City",
         carNumber: "DL 01 AB 5678",
@@ -47,7 +47,7 @@ const mockRides = {
       rating: 5,
       driver: {
         name: "Rajesh Kumar",
-        avatar: "/assets/43_Profile.svg",
+        avatar: "/assets/avatar-male-2.svg",
         rating: 4.9,
         carModel: "Maruti Dzire",
         carNumber: "DL 02 CD 1234",
@@ -63,7 +63,7 @@ const mockRides = {
       rating: 4,
       driver: {
         name: "Amit Patel",
-        avatar: "/assets/43_Profile.svg",
+        avatar: "/assets/avatar-male-3.svg",
         rating: 4.7,
         carModel: "Hyundai Verna",
         carNumber: "MH 01 EF 9012",
@@ -79,7 +79,7 @@ const mockRides = {
       rating: 5,
       driver: {
         name: "Sunita Verma",
-        avatar: "/assets/43_Profile.svg",
+        avatar: "/assets/avatar-female-1.svg",
         rating: 4.9,
         carModel: "Toyota Innova",
         carNumber: "DL 03 GH 3456",

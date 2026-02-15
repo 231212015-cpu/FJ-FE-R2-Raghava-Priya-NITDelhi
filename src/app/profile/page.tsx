@@ -16,13 +16,16 @@ import {
   Edit2,
   ChevronRight,
   Shield,
+  Gift,
 } from "lucide-react";
 import { useAuthStore } from "@/stores/auth-store";
+import { useRideStore } from "@/stores/ride-store";
 import { toast } from "sonner";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { user, updateUser } = useAuthStore();
+  const { loyaltyPoints, pointsPerRide } = useRideStore();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || "",
@@ -33,6 +36,7 @@ export default function ProfilePage() {
   const stats = [
     { label: "Total Rides", value: "48", icon: Car },
     { label: "Rating", value: "4.9", icon: Star },
+    { label: "Loyalty Points", value: loyaltyPoints.toString(), icon: Gift },
     { label: "Member Since", value: "2024", icon: Shield },
   ];
 
@@ -191,6 +195,49 @@ export default function ProfilePage() {
                     <p className="text-xs text-muted-foreground">{stat.label}</p>
                   </div>
                 ))}
+              </div>
+
+              {/* Loyalty Rewards Card */}
+              <div className="mb-6 p-4 bg-gradient-to-r from-primary to-primary/80 rounded-xl text-primary-foreground">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Gift className="w-5 h-5" />
+                    <h3 className="font-semibold">Loyalty Rewards</h3>
+                  </div>
+                  <div className="px-3 py-1 bg-white/20 rounded-full text-xs font-medium">
+                    {loyaltyPoints >= 100 ? "10% OFF" : "Earn More"}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="opacity-90">Current Points</span>
+                    <span className="font-bold">{loyaltyPoints} pts</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="opacity-90">Points per ride</span>
+                    <span className="font-medium">+{pointsPerRide} pts</span>
+                  </div>
+                  {loyaltyPoints < 100 && (
+                    <div className="mt-3 pt-3 border-t border-white/20">
+                      <p className="text-xs opacity-90">
+                        Earn {100 - loyaltyPoints} more points to unlock 10% discount on all rides!
+                      </p>
+                      <div className="mt-2 h-2 bg-white/20 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-white rounded-full transition-all duration-500"
+                          style={{ width: `${(loyaltyPoints / 100) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  {loyaltyPoints >= 100 && (
+                    <div className="mt-3 pt-3 border-t border-white/20">
+                      <p className="text-xs opacity-90">
+                        🎉 Congratulations! You've unlocked 10% discount on all rides!
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Contact Info */}

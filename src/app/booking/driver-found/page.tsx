@@ -11,7 +11,7 @@ import { toast } from "sonner";
 const mockDriver = {
   id: "driver-1",
   name: "Michael Smith",
-  avatar: "/assets/43_Profile.svg",
+  avatar: "/assets/avatar-male-4.svg",
   rating: 4.9,
   trips: 1250,
   carModel: "Toyota Camry",
@@ -25,8 +25,12 @@ export default function DriverFoundPage() {
   const { currentRide } = useRideStore();
   const { addNotification } = useNotificationStore();
   const [showConfetti, setShowConfetti] = useState(true);
+  const [otp, setOtp] = useState<number | null>(null);
 
   useEffect(() => {
+    // Generate OTP on client side only to avoid hydration mismatch
+    setOtp(Math.floor(1000 + Math.random() * 9000));
+
     // Show "driver arriving" notification after 2 seconds
     const arrivingTimer = setTimeout(() => {
       addNotification({
@@ -148,7 +152,7 @@ export default function DriverFoundPage() {
               Share this OTP with your driver
             </p>
             <p className="text-3xl font-bold text-primary tracking-widest">
-              {Math.floor(1000 + Math.random() * 9000)}
+              {otp || "****"}
             </p>
           </div>
         </div>

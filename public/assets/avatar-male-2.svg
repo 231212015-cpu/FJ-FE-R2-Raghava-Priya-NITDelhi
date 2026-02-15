@@ -1,0 +1,55 @@
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="200" cy="200" r="200" fill="#10B981"/>
+  
+  <!-- Face -->
+  <ellipse cx="200" cy="180" rx="85" ry="95" fill="#8B5A3C"/>
+  
+  <!-- Hair -->
+  <path d="M115 145C115 100 145 68 200 68C255 68 285 100 285 145C285 150 284 155 283 160L278 145C273 125 258 108 238 102C218 96 198 96 178 102C158 108 143 125 120 145C117 148 116 146 115 145Z" fill="#1A1A1A"/>
+  <!-- Curly hair texture -->
+  <circle cx="140" cy="110" r="15" fill="#1A1A1A"/>
+  <circle cx="165" cy="95" r="15" fill="#1A1A1A"/>
+  <circle cx="190" cy="88" r="15" fill="#1A1A1A"/>
+  <circle cx="210" cy="88" r="15" fill="#1A1A1A"/>
+  <circle cx="235" cy="95" r="15" fill="#1A1A1A"/>
+  <circle cx="260" cy="110" r="15" fill="#1A1A1A"/>
+  
+  <!-- Ears -->
+  <ellipse cx="115" cy="180" rx="18" ry="25" fill="#734A2E"/>
+  <ellipse cx="285" cy="180" rx="18" ry="25" fill="#734A2E"/>
+  
+  <!-- Eyes -->
+  <ellipse cx="170" cy="170" rx="12" ry="15" fill="white"/>
+  <ellipse cx="230" cy="170" rx="12" ry="15" fill="white"/>
+  <circle cx="172" cy="172" r="8" fill="#1A1A1A"/>
+  <circle cx="232" cy="172" r="8" fill="#1A1A1A"/>
+  <circle cx="174" cy="170" r="3" fill="white"/>
+  <circle cx="234" cy="170" r="3" fill="white"/>
+  
+  <!-- Eyebrows -->
+  <path d="M155 155C160 152 170 150 182 152" stroke="#1A1A1A" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M245 155C240 152 230 150 218 152" stroke="#1A1A1A" stroke-width="4" stroke-linecap="round" fill="none"/>
+  
+  <!-- Nose -->
+  <path d="M200 180L195 200L200 205L205 200L200 180Z" fill="#734A2E"/>
+  
+  <!-- Mouth with smile -->
+  <path d="M175 220C182 228 190 232 200 232C210 232 218 228 225 220" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M175 220C182 226 190 230 200 230C210 230 218 226 225 220" fill="#C96B6B"/>
+  
+  <!-- Beard -->
+  <ellipse cx="200" cy="245" rx="40" ry="25" fill="#1A1A1A"/>
+  <path d="M160 230C170 240 185 245 200 245C215 245 230 240 240 230" fill="#1A1A1A"/>
+  
+  <!-- Neck -->
+  <rect x="175" y="260" width="50" height="40" fill="#734A2E"/>
+  
+  <!-- Shirt -->
+  <path d="M150 300L175 260L200 280L225 260L250 300L250 400L150 400Z" fill="#059669"/>
+  <path d="M200 280L200 400" stroke="#047857" stroke-width="2"/>
+  
+  <!-- Collar -->
+  <path d="M175 260L180 280L200 280" fill="#047857"/>
+  <path d="M225 260L220 280L200 280" fill="#047857"/>
+</svg>

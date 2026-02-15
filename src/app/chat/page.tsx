@@ -10,9 +10,12 @@ import {
   MoreVertical,
   Image as ImageIcon,
   Mic,
+  MicOff,
   Smile,
 } from "lucide-react";
 import { useAuthStore } from "@/stores/auth-store";
+import { a11y, useKeyboard, announceToScreenReader } from "@/lib/accessibility";
+import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
 
 interface Message {
   id: string;
@@ -26,7 +29,7 @@ interface Message {
 const mockDriver = {
   id: "driver-1",
   name: "Rajesh Kumar",
-  avatar: "/assets/43_Profile.svg",
+  avatar: "/assets/avatar-male-2.svg",
   isOnline: true,
 };
 
@@ -74,6 +77,18 @@ export default function ChatPage() {
   const [inputText, setInputText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Voice recognition
+  const { isListening, isSupported, toggleListening } = useVoiceRecognition({
+    onResult: (transcript) => {
+      setInputText((prev) => prev + " " + transcript);
+      announceToScreenReader(`Voice input: ${transcript}`);
+    },
+    onError: (error) => {
+      console.error("Voice error:", error);
+    },
+    continuous: false,
+  });
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -135,7 +150,20 @@ export default function ChatPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    sendMessage(inputText);
+    if (inputText.trim()) {
+      sendMessage(inputText);
+      announceToScreenReader(`Message sent: ${inputText}`);
+    }
+  };
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (useKeyboard.isEnter(e) && !e.shiftKey) {
+      e.preventDefault();
+      if (inputText.trim()) {
+        sendMessage(inputText);
+        announceToScreenReader(`Message sent: ${inputText}`);
+      }
+    }
   };
 
   const formatTime = (date: Date) => {
@@ -154,6 +182,7 @@ export default function ChatPage() {
           <button
             onClick={() => router.back()}
             className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
+            aria-label={a11y.nav.back}
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -170,12 +199,12 @@ export default function ChatPage() {
                 />
               </div>
               {mockDriver.isOnline && (
-                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background" />
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background" aria-label="Driver online" />
               )}
             </div>
             <div>
               <h2 className="font-semibold text-foreground">{mockDriver.name}</h2>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground" aria-live="polite">
                 {isTyping ? "Typing..." : mockDriver.isOnline ? "Online" : "Offline"}
               </p>
             </div>
@@ -184,17 +213,21 @@ export default function ChatPage() {
           <button
             onClick={() => router.push("/call")}
             className="w-10 h-10 rounded-full bg-primary flex items-center justify-center hover:opacity-90 transition-opacity"
+            aria-label="Call driver"
           >
             <Phone className="w-5 h-5 text-primary-foreground" />
           </button>
-          <button className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors">
+          <button 
+            className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
+            aria-label="More options"
+          >
             <MoreVertical className="w-5 h-5" />
           </button>
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4" role="log" aria-label={a11y.chat.messages} aria-live="polite">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -212,6 +245,7 @@ export default function ChatPage() {
                   ? "rounded-br-md"
                   : "rounded-bl-md"
               }`}
+              role="article"
             >
               <p className="text-sm">{message.content}</p>
               <p
@@ -230,7 +264,7 @@ export default function ChatPage() {
         {/* Typing indicator */}
         {isTyping && (
           <div className="flex justify-start">
-            <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3">
+            <div className="bg-muted rounded-2xl rounded-bl-md px-4 py-3" aria-label={a11y.status.typing} role="status">
               <div className="flex gap-1">
                 <div className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" />
                 <div
@@ -255,8 +289,12 @@ export default function ChatPage() {
           {quickReplies.map((reply) => (
             <button
               key={reply}
-              onClick={() => sendMessage(reply)}
+              onClick={() => {
+                sendMessage(reply);
+                announceToScreenReader(`Quick reply sent: ${reply}`);
+              }}
               className="flex-shrink-0 px-4 py-2 bg-muted rounded-full text-sm font-medium text-foreground hover:bg-muted/80 transition-colors"
+              aria-label={`Send quick reply: ${reply}`}
             >
               {reply}
             </button>
@@ -270,6 +308,7 @@ export default function ChatPage() {
           <button
             type="button"
             className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors flex-shrink-0"
+            aria-label="Add emoji"
           >
             <Smile className="w-5 h-5 text-muted-foreground" />
           </button>
@@ -279,12 +318,15 @@ export default function ChatPage() {
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Type a message..."
+              onKeyDown={handleInputKeyDown}
+              placeholder={a11y.chat.input}
+              aria-label={a11y.chat.input}
               className="w-full h-12 px-4 pr-12 rounded-full border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
             <button
               type="button"
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              aria-label="Attach image"
             >
               <ImageIcon className="w-5 h-5" />
             </button>
@@ -294,15 +336,28 @@ export default function ChatPage() {
             <button
               type="submit"
               className="w-12 h-12 rounded-full bg-primary flex items-center justify-center hover:opacity-90 transition-opacity flex-shrink-0"
+              aria-label={a11y.chat.send}
             >
               <Send className="w-5 h-5 text-primary-foreground" />
             </button>
           ) : (
             <button
               type="button"
-              className="w-12 h-12 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors flex-shrink-0"
+              onClick={toggleListening}
+              className={`w-12 h-12 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
+                isListening
+                  ? "bg-destructive animate-pulse"
+                  : "bg-muted hover:bg-muted/80"
+              }`}
+              aria-label={isListening ? "Stop voice recording" : "Start voice recording"}
+              disabled={!isSupported}
+              title={!isSupported ? "Voice input not supported in this browser" : ""}
             >
-              <Mic className="w-5 h-5 text-muted-foreground" />
+              {isListening ? (
+                <MicOff className="w-5 h-5 text-white" />
+              ) : (
+                <Mic className="w-5 h-5 text-muted-foreground" />
+              )}
             </button>
           )}
         </form>

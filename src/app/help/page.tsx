@@ -17,9 +17,13 @@ import {
   MapPin,
   Shield,
   HelpCircle,
-  ExternalLink
+  ExternalLink,
+  Mic,
+  MicOff,
 } from "lucide-react";
 import { toast } from "sonner";
+import { a11y, announceToScreenReader } from "@/lib/accessibility";
+import { useVoiceRecognition } from "@/hooks/useVoiceRecognition";
 
 const faqCategories = [
   {
@@ -146,6 +150,18 @@ export default function HelpPage() {
     },
   ]);
 
+  // Voice recognition for chatbot
+  const { isListening, isSupported, toggleListening } = useVoiceRecognition({
+    onResult: (transcript) => {
+      setChatInput((prev) => prev + " " + transcript);
+      announceToScreenReader(`Voice input: ${transcript}`);
+    },
+    onError: (error) => {
+      console.error("Voice error:", error);
+    },
+    continuous: false,
+  });
+
   const handleSupportAction = (action: string) => {
     switch (action) {
       case "chat":
@@ -163,33 +179,7 @@ export default function HelpPage() {
     }
   };
 
-  const getFaqReply = (query: string) => {
-    const normalized = query.toLowerCase();
-    const allFaqs = faqCategories.flatMap((category) => category.faqs);
-
-    const match = allFaqs.find((faq) =>
-      faq.question.toLowerCase().includes(normalized)
-    );
-    if (match) {
-      return match.answer;
-    }
-
-    const partialMatch = allFaqs.find((faq) => {
-      const tokens = faq.question
-        .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, "")
-        .split(" ")
-        .filter(Boolean);
-      return tokens.some((token) => normalized.includes(token));
-    });
-
-    return (
-      partialMatch?.answer ||
-      "I could not find that yet. Try asking about booking, fare calculation, tipping, or safety."
-    );
-  };
-
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     const trimmed = chatInput.trim();
     if (!trimmed) {
       return;
@@ -205,8 +195,22 @@ export default function HelpPage() {
     setChatInput("");
     setIsBotTyping(true);
 
-    setTimeout(() => {
-      const reply = getFaqReply(trimmed);
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: trimmed,
+          conversationHistory: chatMessages.map((msg) => ({
+            role: msg.role,
+            content: msg.content,
+          })),
+        }),
+      });
+
+      const data = await response.json();
+      const reply = data.reply || "I couldn't process that request.";
+
       setChatMessages((prev) => [
         ...prev,
         {
@@ -215,8 +219,20 @@ export default function HelpPage() {
           content: reply,
         },
       ]);
+    } catch (error) {
+      console.error("Chat error:", error);
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          id: `assistant-${Date.now()}`,
+          role: "assistant" as const,
+          content:
+            "Sorry, I couldn't connect to the assistant. Please try again.",
+        },
+      ]);
+    } finally {
       setIsBotTyping(false);
-    }, 500);
+    }
   };
 
   const filteredCategories = searchQuery
@@ -238,6 +254,7 @@ export default function HelpPage() {
           <button
             onClick={() => router.back()}
             className="w-10 h-10 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
+            aria-label={a11y.nav.back}
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -250,8 +267,14 @@ export default function HelpPage() {
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              if (e.target.value) {
+                announceToScreenReader(`Showing results for: ${e.target.value}`);
+              }
+            }}
             placeholder="Search for help..."
+            aria-label="Search help articles"
             className="w-full h-12 pl-12 pr-4 rounded-xl border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
@@ -268,6 +291,7 @@ export default function HelpPage() {
                 key={index}
                 onClick={() => handleSupportAction(option.action)}
                 className="bg-card border border-border rounded-xl p-4 text-center hover:border-primary/50 transition-colors"
+                aria-label={`${option.title}: ${option.description}`}
               >
                 <div className="w-12 h-12 mx-auto mb-2 rounded-full bg-primary/10 text-primary flex items-center justify-center">
                   {option.icon}
@@ -289,13 +313,18 @@ export default function HelpPage() {
               <div>
                 <h3 className="font-semibold text-foreground">Help Chatbot</h3>
                 <p className="text-xs text-muted-foreground">
-                  Simple ride FAQ assistant (simulated)
+                  AI-powered FAQ assistant (OpenAI powered)
                 </p>
               </div>
             </div>
             <button
-              onClick={() => setShowChatbot((prev) => !prev)}
+              onClick={() => {
+                setShowChatbot((prev) => !prev);
+                announceToScreenReader(`Chatbot ${showChatbot ? "closed" : "opened"}`);
+              }}
               className="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold"
+              aria-label={showChatbot ? "Hide chatbot" : "Show chatbot"}
+              aria-expanded={showChatbot}
             >
               {showChatbot ? "Hide" : "Open"}
             </button>
@@ -303,7 +332,7 @@ export default function HelpPage() {
 
           {showChatbot && (
             <div className="space-y-3">
-              <div className="h-56 overflow-y-auto bg-muted/40 rounded-xl p-3 space-y-2">
+              <div className="h-56 overflow-y-auto bg-muted/40 rounded-xl p-3 space-y-2" role="log" aria-label="Chat conversation" aria-live="polite">
                 {chatMessages.map((message) => (
                   <div
                     key={message.id}
@@ -317,6 +346,7 @@ export default function HelpPage() {
                           ? "bg-primary text-primary-foreground"
                           : "bg-background border border-border text-foreground"
                       }`}
+                      role="article"
                     >
                       {message.content}
                     </div>
@@ -324,7 +354,7 @@ export default function HelpPage() {
                 ))}
                 {isBotTyping && (
                   <div className="flex justify-start">
-                    <div className="rounded-2xl px-3 py-2 text-sm bg-background border border-border text-muted-foreground">
+                    <div className="rounded-2xl px-3 py-2 text-sm bg-background border border-border text-muted-foreground" role="status" aria-label="Bot is typing">
                       Typing...
                     </div>
                   </div>
@@ -337,20 +367,43 @@ export default function HelpPage() {
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
                       handleSendMessage();
                     }
                   }}
-                  placeholder="Ask about rides, pricing, or safety"
+                  placeholder={a11y.chat.input}
+                  aria-label={a11y.chat.input}
                   className="flex-1 h-11 px-4 rounded-xl border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
-                <button
-                  onClick={handleSendMessage}
-                  className="w-11 h-11 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity"
-                  aria-label="Send message"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
+                {chatInput.trim() ? (
+                  <button
+                    onClick={handleSendMessage}
+                    className="w-11 h-11 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity"
+                    aria-label={a11y.chat.send}
+                    disabled={isBotTyping}
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={toggleListening}
+                    className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${
+                      isListening
+                        ? "bg-destructive animate-pulse"
+                        : "bg-muted hover:bg-muted/80"
+                    }`}
+                    aria-label={isListening ? "Stop voice recording" : "Start voice recording"}
+                    disabled={!isSupported || isBotTyping}
+                    title={!isSupported ? "Voice input not supported" : ""}
+                  >
+                    {isListening ? (
+                      <MicOff className="w-4 h-4 text-white" />
+                    ) : (
+                      <Mic className="w-4 h-4 text-muted-foreground" />
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           )}

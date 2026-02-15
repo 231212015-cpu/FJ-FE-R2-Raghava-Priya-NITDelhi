@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { toast } from "sonner";
 import {
   ArrowLeft,
   MapPin,
@@ -13,6 +14,9 @@ import {
   ChevronRight,
   Car,
   Zap,
+  Share2,
+  Copy,
+  Check,
 } from "lucide-react";
 import { useRideStore } from "@/stores/ride-store";
 import type { RideType } from "@/types";
@@ -104,6 +108,8 @@ export default function SelectRidePage() {
 
   const [selectedPayment, setSelectedPayment] = useState("card");
   const [showPaymentSheet, setShowPaymentSheet] = useState(false);
+  const [shareLink, setShareLink] = useState("");
+  const [linkCopied, setLinkCopied] = useState(false);
   const [promoCode, setPromoCode] = useState("");
 
   useEffect(() => {
@@ -111,6 +117,64 @@ export default function SelectRidePage() {
       router.replace("/booking/location");
     }
   }, [pickup, destination, router]);
+
+  // Generate shareable link when shared ride is enabled
+  useEffect(() => {
+    if (sharedRide) {
+      const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+      const selectedOpt = rideOptions.find((o) => o.id === selectedRideType);
+      const rawFare = calculateFare(selectedOpt?.multiplier || 1);
+      const finalFare = applyLoyaltyDiscount(rawFare);
+      const perPerson = finalFare / splitCount;
+      
+      const rideData = {
+        pickup: pickup?.address,
+        destination: destination?.address,
+        fare: formatFare(perPerson),
+        totalFare: formatFare(finalFare),
+        riders: splitCount,
+        rideType: selectedOpt?.name,
+      };
+      const encodedData = encodeURIComponent(JSON.stringify(rideData));
+      const link = `${baseUrl}/booking/share?data=${encodedData}`;
+      setShareLink(link);
+    } else {
+      setShareLink("");
+      setLinkCopied(false);
+    }
+  }, [sharedRide, splitCount, selectedRideType, pickup, destination]);
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      setLinkCopied(true);
+      toast.success("Share link copied!");
+      setTimeout(() => setLinkCopied(false), 3000);
+    } catch (err) {
+      toast.error("Failed to copy link");
+    }
+  };
+
+  const handleShareLink = async () => {
+    if (navigator.share) {
+      try {
+        const selectedOpt = rideOptions.find((o) => o.id === selectedRideType);
+        const rawFare = calculateFare(selectedOpt?.multiplier || 1);
+        const finalFare = applyLoyaltyDiscount(rawFare);
+        const perPerson = finalFare / splitCount;
+        
+        await navigator.share({
+          title: 'Share Ride',
+          text: `Join my ride! Your share: $${formatFare(perPerson)}`,
+          url: shareLink,
+        });
+      } catch (err) {
+        // User cancelled or error occurred
+      }
+    } else {
+      handleCopyLink();
+    }
+  };
 
   const selectedOption = rideOptions.find((o) => o.id === selectedRideType);
   const selectedPaymentMethod = paymentMethods.find(
@@ -355,6 +419,47 @@ export default function SelectRidePage() {
                     Total ${formatFare(selectedFare)}
                   </span>
                 </div>
+
+                {/* Share Link Section */}
+                <div className="pt-3 border-t border-border space-y-2">
+                  <p className="text-xs font-medium text-foreground flex items-center gap-2">
+                    <Share2 className="w-3.5 h-3.5" />
+                    Share ride with friends
+                  </p>
+                  <div className="flex gap-2">
+                    <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-background rounded-lg border border-border">
+                      <span className="text-xs text-muted-foreground truncate flex-1">
+                        {shareLink ? `...${shareLink.slice(-30)}` : "Generating link..."}
+                      </span>
+                    </div>
+                    <button
+                      onClick={handleCopyLink}
+                      className="px-3 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity flex items-center gap-1.5"
+                    >
+                      {linkCopied ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          <span className="text-xs font-medium">Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          <span className="text-xs font-medium">Copy</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  <button
+                    onClick={handleShareLink}
+                    className="w-full py-2 bg-muted hover:bg-muted/80 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Share2 className="w-4 h-4 text-foreground" />
+                    <span className="text-xs font-medium text-foreground">Share via...</span>
+                  </button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    Each person pays ${formatFare(perPersonFare)}
+                  </p>
+                </div>
               </>
             )}
           </div>
@@ -397,7 +502,31 @@ export default function SelectRidePage() {
         </div>
 
         {/* Book Button */}
-        <div className="p-4 border-t border-border bg-background safe-area-bottom">
+        <div className="p-4 border-t border-border bg-background safe-area-bottom space-y-3">
+          {/* Loyalty Discount Badge */}
+          {getLoyaltyDiscountPercent() > 0 && (
+            <div className="flex items-center justify-between p-3 bg-primary/10 rounded-xl">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🎉</span>
+                <div>
+                  <p className="text-sm font-medium text-primary">
+                    Loyalty Discount Applied
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    You saved ${formatFare(selectedFare - applyLoyaltyDiscount(selectedFare))} with your {loyaltyPoints} points
+                  </p>
+                </div>
+              </div>
+              <p className="text-lg font-bold text-primary">-{getLoyaltyDiscountPercent()}%</p>
+            </div>
+          )}
+          
+          {/* Points Earned Preview */}
+          <div className="flex items-center justify-between px-3 py-2 bg-muted/50 rounded-lg">
+            <p className="text-xs text-muted-foreground">You'll earn after this ride</p>
+            <p className="text-sm font-medium text-foreground">+{pointsPerRide} points</p>
+          </div>
+
           <button
             onClick={handleBookRide}
             disabled={isLoading}
